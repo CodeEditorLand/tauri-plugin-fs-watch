@@ -5,7 +5,7 @@ Watch files and directories for changes using
 
 ## Install
 
-_This plugin requires a Rust version of at least **1.64**_
+_This plugin requires a Rust version of at least **1.67**_
 
 There are three general methods of installation that we can recommend.
 
