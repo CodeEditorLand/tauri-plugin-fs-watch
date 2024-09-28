@@ -1,5 +1,15 @@
 {
+<<<<<<< HEAD
 	"name": "tauri-plugin-fs-watch-api",
+=======
+	"authors": [
+		"Tauri Programme within The Commons Conservancy"
+	],
+	"browser": "dist-js/index.min.js",
+	"dependencies": {
+		"@tauri-apps/api": "2.0.0-rc.5"
+	},
+>>>>>>> a9602fd44ef68fac931e11d562571000ec68f45a
 	"description": "Watch files and directories for changes.",
 	"exports": {
 		"browser": "./dist-js/index.min.js",
