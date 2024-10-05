@@ -1,12 +1,3 @@
-use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
-use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
-use serde::{ser::Serializer, Deserialize, Serialize};
-use tauri::{
-	command,
-	plugin::{Builder as PluginBuilder, TauriPlugin},
-	Manager, Runtime, State, Window,
-};
-
 use std::{
 	collections::HashMap,
 	path::PathBuf,
@@ -16,6 +7,18 @@ use std::{
 	},
 	thread::spawn,
 	time::Duration,
+};
+
+use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
+use serde::{ser::Serializer, Deserialize, Serialize};
+use tauri::{
+	command,
+	plugin::{Builder as PluginBuilder, TauriPlugin},
+	Manager,
+	Runtime,
+	State,
+	Window,
 };
 
 type Result<T> = std::result::Result<T, Error>;
@@ -28,10 +31,12 @@ pub enum Error {
 }
 
 impl Serialize for Error {
-	fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+	fn serialize<S>(
+		&self,
+		serializer:S,
+	) -> std::result::Result<S::Ok, S::Error>
 	where
-		S: Serializer,
-	{
+		S: Serializer, {
 		serializer.serialize_str(self.to_string().as_ref())
 	}
 }
@@ -44,7 +49,11 @@ enum WatcherKind {
 	Watcher(RecommendedWatcher),
 }
 
-fn watch_raw<R: Runtime>(window: Window<R>, rx: Receiver<notify::Result<Event>>, id: Id) {
+fn watch_raw<R:Runtime>(
+	window:Window<R>,
+	rx:Receiver<notify::Result<Event>>,
+	id:Id,
+) {
 	spawn(move || {
 		let event_name = format!("watcher://raw-event/{id}");
 		while let Ok(event) = rx.recv() {
@@ -56,7 +65,11 @@ fn watch_raw<R: Runtime>(window: Window<R>, rx: Receiver<notify::Result<Event>>,
 	});
 }
 
-fn watch_debounced<R: Runtime>(window: Window<R>, rx: Receiver<DebounceEventResult>, id: Id) {
+fn watch_debounced<R:Runtime>(
+	window:Window<R>,
+	rx:Receiver<DebounceEventResult>,
+	id:Id,
+) {
 	spawn(move || {
 		let event_name = format!("watcher://debounced-event/{id}");
 		while let Ok(event) = rx.recv() {
@@ -71,20 +84,23 @@ fn watch_debounced<R: Runtime>(window: Window<R>, rx: Receiver<DebounceEventResu
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct WatchOptions {
-	delay_ms: Option<u64>,
-	recursive: bool,
+	delay_ms:Option<u64>,
+	recursive:bool,
 }
 
 #[command]
-async fn watch<R: Runtime>(
-	window: Window<R>,
-	watchers: State<'_, WatcherCollection>,
-	id: Id,
-	paths: Vec<PathBuf>,
-	options: WatchOptions,
+async fn watch<R:Runtime>(
+	window:Window<R>,
+	watchers:State<'_, WatcherCollection>,
+	id:Id,
+	paths:Vec<PathBuf>,
+	options:WatchOptions,
 ) -> Result<()> {
-	let mode =
-		if options.recursive { RecursiveMode::Recursive } else { RecursiveMode::NonRecursive };
+	let mode = if options.recursive {
+		RecursiveMode::Recursive
+	} else {
+		RecursiveMode::NonRecursive
+	};
 
 	let watcher = if let Some(delay) = options.delay_ms {
 		let (tx, rx) = channel();
@@ -111,25 +127,25 @@ async fn watch<R: Runtime>(
 }
 
 #[command]
-async fn unwatch(watchers: State<'_, WatcherCollection>, id: Id) -> Result<()> {
+async fn unwatch(watchers:State<'_, WatcherCollection>, id:Id) -> Result<()> {
 	if let Some((watcher, paths)) = watchers.0.lock().unwrap().remove(&id) {
 		match watcher {
 			WatcherKind::Debouncer(mut debouncer) => {
 				for path in paths {
 					debouncer.watcher().unwatch(&path)?
 				}
-			}
+			},
 			WatcherKind::Watcher(mut watcher) => {
 				for path in paths {
 					watcher.unwatch(&path)?
 				}
-			}
+			},
 		};
 	}
 	Ok(())
 }
 
-pub fn init<R: Runtime>() -> TauriPlugin<R> {
+pub fn init<R:Runtime>() -> TauriPlugin<R> {
 	PluginBuilder::new("fs-watch")
 		.invoke_handler(tauri::generate_handler![watch, unwatch])
 		.setup(|app| {
