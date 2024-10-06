@@ -31,10 +31,7 @@ pub enum Error {
 }
 
 impl Serialize for Error {
-	fn serialize<S>(
-		&self,
-		serializer:S,
-	) -> std::result::Result<S::Ok, S::Error>
+	fn serialize<S>(&self, serializer:S) -> std::result::Result<S::Ok, S::Error>
 	where
 		S: Serializer, {
 		serializer.serialize_str(self.to_string().as_ref())
@@ -49,11 +46,7 @@ enum WatcherKind {
 	Watcher(RecommendedWatcher),
 }
 
-fn watch_raw<R:Runtime>(
-	window:Window<R>,
-	rx:Receiver<notify::Result<Event>>,
-	id:Id,
-) {
+fn watch_raw<R:Runtime>(window:Window<R>, rx:Receiver<notify::Result<Event>>, id:Id) {
 	spawn(move || {
 		let event_name = format!("watcher://raw-event/{id}");
 		while let Ok(event) = rx.recv() {
@@ -65,11 +58,7 @@ fn watch_raw<R:Runtime>(
 	});
 }
 
-fn watch_debounced<R:Runtime>(
-	window:Window<R>,
-	rx:Receiver<DebounceEventResult>,
-	id:Id,
-) {
+fn watch_debounced<R:Runtime>(window:Window<R>, rx:Receiver<DebounceEventResult>, id:Id) {
 	spawn(move || {
 		let event_name = format!("watcher://debounced-event/{id}");
 		while let Ok(event) = rx.recv() {
