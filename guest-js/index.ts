@@ -52,7 +52,9 @@ export async function watch(
 		delayMs: 2000,
 		...options,
 	};
+
 	let watchPaths;
+
 	if (typeof paths === "string") {
 		watchPaths = [paths];
 	} else {
@@ -90,7 +92,9 @@ export async function watchImmediate(
 		...options,
 		delayMs: null,
 	};
+
 	let watchPaths;
+
 	if (typeof paths === "string") {
 		watchPaths = [paths];
 	} else {
