@@ -26,6 +26,7 @@ type RawEventKind =
 			remove?: unknown;
 	  }
 	| "other";
+
 export type DebouncedEvent =
 	| {
 			kind: "Any";
@@ -35,14 +36,17 @@ export type DebouncedEvent =
 			kind: "AnyContinuous";
 			path: string;
 	  }[];
+
 export declare function watch(
 	paths: string | string[],
 	cb: (event: DebouncedEvent) => void,
 	options?: DebouncedWatchOptions,
 ): Promise<UnlistenFn>;
+
 export declare function watchImmediate(
 	paths: string | string[],
 	cb: (event: RawEvent) => void,
 	options?: WatchOptions,
 ): Promise<UnlistenFn>;
+
 export {};
