@@ -14,7 +14,9 @@ export interface DebouncedWatchOptions extends WatchOptions {
 
 export type RawEvent = {
 	type: RawEventKind;
+
 	paths: string[];
+
 	attrs: unknown;
 };
 
@@ -78,6 +80,7 @@ export async function watch(
 
 	return () => {
 		void unwatch(id);
+
 		unlisten();
 	};
 }
@@ -118,6 +121,7 @@ export async function watchImmediate(
 
 	return () => {
 		void unwatch(id);
+
 		unlisten();
 	};
 }

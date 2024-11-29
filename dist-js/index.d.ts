@@ -8,7 +8,9 @@ export interface DebouncedWatchOptions extends WatchOptions {
 }
 export type RawEvent = {
 	type: RawEventKind;
+
 	paths: string[];
+
 	attrs: unknown;
 };
 type RawEventKind =
@@ -30,10 +32,12 @@ type RawEventKind =
 export type DebouncedEvent =
 	| {
 			kind: "Any";
+
 			path: string;
 	  }[]
 	| {
 			kind: "AnyContinuous";
+
 			path: string;
 	  }[];
 
