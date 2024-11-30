@@ -49,6 +49,7 @@ enum WatcherKind {
 fn watch_raw<R:Runtime>(window:Window<R>, rx:Receiver<notify::Result<Event>>, id:Id) {
 	spawn(move || {
 		let event_name = format!("watcher://raw-event/{id}");
+
 		while let Ok(event) = rx.recv() {
 			if let Ok(event) = event {
 				// TODO: Should errors be emitted too?
@@ -61,6 +62,7 @@ fn watch_raw<R:Runtime>(window:Window<R>, rx:Receiver<notify::Result<Event>>, id
 fn watch_debounced<R:Runtime>(window:Window<R>, rx:Receiver<DebounceEventResult>, id:Id) {
 	spawn(move || {
 		let event_name = format!("watcher://debounced-event/{id}");
+
 		while let Ok(event) = rx.recv() {
 			if let Ok(event) = event {
 				// TODO: Should errors be emitted too?
@@ -93,20 +95,29 @@ async fn watch<R:Runtime>(
 
 	let watcher = if let Some(delay) = options.delay_ms {
 		let (tx, rx) = channel();
+
 		let mut debouncer = new_debouncer(Duration::from_millis(delay), tx)?;
+
 		let watcher = debouncer.watcher();
+
 		for path in &paths {
 			watcher.watch(path, mode)?;
 		}
+
 		watch_debounced(window, rx, id);
+
 		WatcherKind::Debouncer(debouncer)
 	} else {
 		let (tx, rx) = channel();
+
 		let mut watcher = RecommendedWatcher::new(tx, Config::default())?;
+
 		for path in &paths {
 			watcher.watch(path, mode)?;
 		}
+
 		watch_raw(window, rx, id);
+
 		WatcherKind::Watcher(watcher)
 	};
 
@@ -131,6 +142,7 @@ async fn unwatch(watchers:State<'_, WatcherCollection>, id:Id) -> Result<()> {
 			},
 		};
 	}
+
 	Ok(())
 }
 
@@ -139,6 +151,7 @@ pub fn init<R:Runtime>() -> TauriPlugin<R> {
 		.invoke_handler(tauri::generate_handler![watch, unwatch])
 		.setup(|app| {
 			app.manage(WatcherCollection::default());
+
 			Ok(())
 		})
 		.build()
