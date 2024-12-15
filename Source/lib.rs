@@ -2,23 +2,23 @@ use std::{
 	collections::HashMap,
 	path::PathBuf,
 	sync::{
-		mpsc::{channel, Receiver},
 		Mutex,
+		mpsc::{Receiver, channel},
 	},
 	thread::spawn,
 	time::Duration,
 };
 
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
-use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
-use serde::{ser::Serializer, Deserialize, Serialize};
+use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
+use serde::{Deserialize, Serialize, ser::Serializer};
 use tauri::{
-	command,
-	plugin::{Builder as PluginBuilder, TauriPlugin},
 	Manager,
 	Runtime,
 	State,
 	Window,
+	command,
+	plugin::{Builder as PluginBuilder, TauriPlugin},
 };
 
 type Result<T> = std::result::Result<T, Error>;
